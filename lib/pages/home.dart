@@ -1,3 +1,4 @@
+import 'package:chatti/pages/play.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -37,9 +38,13 @@ class _HomeState extends State<Home> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   FlatButton.icon(
-                    onPressed: (){},
+                    onPressed: (){
+                      Navigator.pushNamed(context, "/play", arguments: {
+                        "type": Play.DIRECT_TYPE
+                      });
+                    },
                     icon: Icon(Icons.play_arrow, color: Colors.grey[100]),
-                    label: Text("DIRECT SPIELEN", style: TextStyle(color: Colors.grey[100]),),
+                    label: Text("DIREKT SPIELEN", style: TextStyle(color: Colors.grey[100]),),
                     color: Colors.yellow[800],
                   ),
                   FlatButton.icon(

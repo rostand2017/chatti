@@ -13,66 +13,68 @@ class Part extends StatefulWidget {
 }
 
 class _PartState extends State<Part> {
-  int nbPart ;
-  String level;
-  int currentPart;
-  HashMap<String, int> scores = HashMap();
+  int _nbPart ;
+  String _level;
+  int _currentPart;
+  HashMap<String, int> _scores = HashMap();
 
-  void play(index){
+  void play(index) {
     Navigator.pushNamed(context, "/play", arguments: {
-      "level": level,
-      "currentPart": currentPart,
+      "level": _level,
+      "currentPart": _currentPart,
       "part": index+1,
       "type": Play.PART_TYPE
     });
   }
 
   bool isEnable(index) {
-    return (currentPart >= index+1 || index == 0);
+    return (_currentPart >= index+1 || index == 0);
   }
 
 
   @override
   void initState(){
     super.initState();
+    setScores();
   }
 
   void setScores() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     HashMap<String, int> goodScores = HashMap();
-    for(var i=1; i <= nbPart; i++){
-      goodScores.putIfAbsent("$level.$i",()=>prefs.getInt("$level.$i")??0);
+    for(var i=1; i <= _nbPart; i++){
+      goodScores.putIfAbsent("$_level.$i",()=>prefs.getInt("$_level.$i")??0);
     }
     setState(() {
-      scores = goodScores;
+      _scores = goodScores;
+      _currentPart = prefs.getInt(_level)??1;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print("build");
     Map arguments = ModalRoute.of(context).settings.arguments;
-    level = arguments['level'];
-    currentPart = arguments['currentPart'];
-    nbPart = (NBWord.NB_WORDS[level] / NBWord.NB_WORD_PER_PLAY).round();
-    setScores();
+    _level = arguments['level'];
+    _currentPart = arguments['currentPart'];
+    _nbPart = (NBWord.NB_WORDS[_level] / NBWord.NB_WORD_PER_PLAY).round();
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: ListView.builder(
-        itemCount: (nbPart),
+        itemCount: (_nbPart),
         itemBuilder: (context, index){
           return Card(
             child: ListTile(
               onTap: () => play(index),
               title: Text("Teil ${index+1}"),
-              subtitle: Text('Punkte: ${scores.putIfAbsent("$level.${index+1}", () => 0)} von 20'),
+              subtitle: Text('Punkte: ${_scores.putIfAbsent("$_level.${index+1}", () => 0)} von 20'),
               enabled: isEnable(index),
             ),
           );
         },
       ),
       appBar: AppBar(
-        title: Text("NIVEAU $level"),
+        title: Text("NIVEAU $_level"),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),

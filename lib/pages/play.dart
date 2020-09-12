@@ -20,6 +20,7 @@ class Play extends StatefulWidget {
 
 class _PlayState extends State<Play>{
 
+  // NB_STEP: number of plays in a step
   static const int NB_STEP = 20;
   double progression = 0;
   Timer timer;
@@ -69,28 +70,29 @@ class _PlayState extends State<Play>{
 
   void runNextStep(int seconds){
     timer.cancel();
-    Future.delayed(Duration(seconds: 5), (){
-      print("fuckkkkk!");
-      /*
+    Future.delayed(Duration(seconds: seconds), (){
       if(position < NB_STEP-1){
         //words.remove(position);
         position ++;
         print("word: ${words[position].word}");
+        print("fuckkkkk! $seconds");
         clicked = false;
         startTimer();
         setSolutions();
       }else{
         gotoNextTeil();
-      }*/
+      }
     });
   }
 
   void gotoNextTeil() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(currentPart <= part){
-      prefs.setInt(level, part+1);
+    if(type != Play.DIRECT_TYPE){
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      if(currentPart <= part){
+        prefs.setInt(level, part+1);
+      }
+      prefs.setInt("$level.$part", score);
     }
-    prefs.setInt("$level.$part", score);
     showScore();
   }
 
@@ -101,10 +103,12 @@ class _PlayState extends State<Play>{
 
   void setLevel(BuildContext context){
     Map arguments = ModalRoute.of(context).settings.arguments;
-    level = arguments['level'];
-    part = arguments['part'];
-    currentPart = arguments['currentPart'];
     type = arguments['type'];
+    if(type != Play.DIRECT_TYPE){
+      level = arguments['level'];
+      part = arguments['part'];
+      currentPart = arguments['currentPart'];
+    }
   }
 
   void showScore(){
@@ -119,27 +123,36 @@ class _PlayState extends State<Play>{
   @override
   void dispose() {
     // TODO: implement dispose
-    print("disposeeee");
+    print("dispose");
     timer.cancel();
     super.dispose();
   }
 
   /**
-   * set the 20 words to predict for  a PART
+   * set the 20 words to predict for a PART
    */
   void setWords(){
-    switch(level){
-      case "A1":
-        words = wordsA1.getRange(part*NB_STEP - NB_STEP, part*NB_STEP);
-        words.shuffle();
-        break;
-      case "A2":
-        print("jello ${part}");
-        words = wordsA2.getRange(part*NB_STEP - NB_STEP, part*NB_STEP).toList();
-        words.shuffle();
-        break;
-      default:
-        print("fuck!!!!! $level");
+    if(type == Play.DIRECT_TYPE){
+      List<Word> wordsTemp = [];
+      wordsTemp.addAll(wordsA1);
+      wordsTemp.addAll(wordsA2);
+      wordsTemp.shuffle();
+      words = wordsTemp.getRange(0, NB_STEP).toList();
+      print("words: ${words.length}");
+    }else{
+      switch(level){
+        case "A1":
+          words = wordsA1.getRange(part*NB_STEP - NB_STEP, part*NB_STEP);
+          words.shuffle();
+          break;
+        case "A2":
+          print("jello ${part}");
+          words = wordsA2.getRange(part*NB_STEP - NB_STEP, part*NB_STEP).toList();
+          words.shuffle();
+          break;
+        default:
+          print("fuck!!!!! $level");
+      }
     }
   }
 
@@ -148,27 +161,36 @@ class _PlayState extends State<Play>{
    *  use this function in any step of a 20 steps of a part
    */
   void setSolutions(){
-    switch(level){
-      case "A1":
-        List<Word> wordA1Copy = List.from(wordsA1);
-        wordA1Copy.remove(words[position]);
-        int rd = Random().nextInt(NBWord.NB_WORD_A1 - 1);
-        if (rd+2 >= (NBWord.NB_WORD_A1-2) )
-          solutions = wordA1Copy.getRange(rd-2, rd).toList();
-        else
-          solutions = wordA1Copy.getRange(rd, rd+2).toList();
-        break;
-      case "A2":
+    if(type == Play.DIRECT_TYPE){
+      List<Word> wordsTemp = [];
+      wordsTemp.addAll(wordsA1);
+      wordsTemp.addAll(wordsA2);
+      wordsTemp.remove(words[position]);
+      wordsTemp.shuffle();
+      solutions = wordsTemp.getRange(0, 2).toList();
+    }else{
+      switch(level){
+        case "A1":
+          List<Word> wordA1Copy = List.from(wordsA1);
+          wordA1Copy.remove(words[position]);
+          int rd = Random().nextInt(NBWord.NB_WORD_A1 - 2);
+          if (rd+2 >= (NBWord.NB_WORD_A1-2) )
+            solutions = wordA1Copy.getRange(rd-2, rd).toList();
+          else
+            solutions = wordA1Copy.getRange(rd, rd+2).toList();
+          break;
+        case "A2":
         // removing the good word in the list of false answers
-        List<Word> wordA2Copy = List.from(wordsA2);
-        wordA2Copy.remove(words[position]);
-        print("etw: ${wordA2Copy.length}");
-        int rd = Random().nextInt(NBWord.NB_WORD_A2 - 2);
-        if (rd+2 >= (NBWord.NB_WORD_A2 - 2))
-          solutions = wordA2Copy.getRange(rd-2, rd).toList();
-        else
-          solutions = wordA2Copy.getRange(rd, rd+2).toList();
-        break;
+          List<Word> wordA2Copy = List.from(wordsA2);
+          wordA2Copy.remove(words[position]);
+          print("etw: ${wordA2Copy.length}");
+          int rd = Random().nextInt(NBWord.NB_WORD_A2 - 2);
+          if (rd+2 >= (NBWord.NB_WORD_A2 - 2))
+            solutions = wordA2Copy.getRange(rd-2, rd).toList();
+          else
+            solutions = wordA2Copy.getRange(rd, rd+2).toList();
+          break;
+      }
     }
     // add good answer
     solutions.add(words[position]);
@@ -240,12 +262,13 @@ class _PlayState extends State<Play>{
   @override
   Widget build(BuildContext context) {
     setLevel(context);
+    print("builtttt");
     if(words == null){
       setWords();
       playOnce();
     }
     return Scaffold(
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.white,
       body: SafeArea(
           child: Container(
             /*decoration: BoxDecoration(

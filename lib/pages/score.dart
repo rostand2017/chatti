@@ -16,10 +16,15 @@ class _ScoreState extends State<Score> {
   String type;
 
   String getButtonText(int part){
-    return part<(NBWord.NB_WORD_A2/NBWord.NB_WORD_PER_PLAY).floor()?"Weiter spielen":"Teil fertig";
+    return part == null? "Wiederholen" : part<(NBWord.NB_WORD_A2/NBWord.NB_WORD_PER_PLAY).floor()? "Weiter spielen": "Teil fertig";
   }
 
   void gotToNext(int part, String level) async{
+    if(part == null){
+      Navigator.pushReplacementNamed(context, "/play", arguments: {
+        "type": Play.DIRECT_TYPE
+      });
+    }
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int currentPart = prefs.getInt(level)??1;
     Map arguments = {
@@ -31,7 +36,7 @@ class _ScoreState extends State<Score> {
     if(part < (NBWord.NB_WORD_A2/NBWord.NB_WORD_PER_PLAY).floor()){
       Navigator.pushReplacementNamed(context, "/play", arguments:arguments);
     }else{
-      Navigator.popAndPushNamed(context, "/part", arguments: arguments);
+      Navigator.pop(context, arguments);
     }
   }
 
@@ -53,42 +58,50 @@ class _ScoreState extends State<Score> {
     return Scaffold(
       body: Center(
         child: Container(
-            padding: EdgeInsets.all(50),
-            child: Column(
+            padding: EdgeInsets.all(10),
+            child: ListView(
               children: [
-                CircleAvatar(
-                  child: SvgPicture.asset(
-                    getImage(score),
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.fill,
+                SafeArea(
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        child: SvgPicture.asset(
+                          getImage(score),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.fill,
+                        ),
+                        radius: 100,
+                      ),
+                      SizedBox(height: 20,),
+                      Text(
+                          "$score/20",
+                          style: TextStyle(
+                              color: Colors.orange,
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold
+                          )
+                      ),
+                      Text(
+                        (part!= null )?"Score Teil $part":"Score direkt Spiel",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 35.0,
+                          letterSpacing: 2.0,
+                          fontWeight: FontWeight.bold,
+                        )
+                      ),
+                      Text(getAppreciation(score)),
+                      SizedBox(height: 20,),
+                      RaisedButton(
+                        child: Text(getButtonText(part),style: TextStyle(color: Colors.white),),
+                        padding: EdgeInsets.fromLTRB(60, 15, 60, 15),
+                        color: Colors.blue,
+                        onPressed: ()=>gotToNext(part, level),
+                      ),
+                    ],
                   ),
-                  radius: 100,
                 ),
-                Text(
-                  "Score Teil $part",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 40.0,
-                    letterSpacing: 2.0,
-                    fontWeight: FontWeight.bold,
-                  )
-                ),
-                Text(
-                  " $score/20",
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontSize: 30.0
-                  )
-                ),
-                Text(getAppreciation(score)),
-                SizedBox(height: 20,),
-                RaisedButton(
-                  child: Text(getButtonText(part),style: TextStyle(color: Colors.white),),
-                  padding: EdgeInsets.all(15),
-                  color: Colors.blue,
-                  onPressed: ()=>gotToNext(part, level),
-                )
               ],
             ),
           ),
