@@ -18,20 +18,26 @@ class _HomeState extends State<Home> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.translate, color: Colors.black),
-                  Text(
-                    'Wortschatz',
-                    style: TextStyle(
-                      fontSize: 38,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2.0,
-                    ),
-                  ),
-                ]
+              TweenAnimationBuilder(
+                duration: Duration(milliseconds: 2000),
+                tween: ColorTween(begin: Colors.red, end: Colors.black),
+                builder: (BuildContext context, Color value, Widget child) {
+                  return  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.translate, color: value),
+                        Text(
+                          'Wortschatz',
+                          style: TextStyle(
+                            fontSize: 38,
+                            color: value,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2.0,
+                          ),
+                        ),
+                      ]
+                  );
+                },
               ),
               SizedBox(height: 20),
               Column(
