@@ -1,6 +1,9 @@
+import 'dart:math';
+import 'dart:ui';
 import 'package:chatti/pages/play.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -8,8 +11,43 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Tween<double> _tweenRotation;
+  var _player = AudioPlayer();
+  bool _isPlayerstop = false;
+  _startBackgroundSound() async{
+    try{
+      await _player.setUrl("http://www.orangefreesounds.com/wp-content/uploads/2020/07/Funny-music-loop-for-games-and-videos.mp3");
+      await _player.setVolume(0.4);
+      _player.setLoopMode(LoopMode.all);
+      _player.play();
+    }catch(e){
+      print("bad url exception !");
+      print(e);
+    }
+  }
+
+  @override
+  void dispose() {
+    print("dispose.....dispose.....dispose.....dispose.....dispose.....dispose.....dispose.....");
+    _player.dispose();
+    _isPlayerstop = true;
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _startBackgroundSound();
+    _tweenRotation = Tween<double>(begin: pi, end: 0);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if(_isPlayerstop){
+      print("Replay...Replay...Replay...Replay...Replay...");
+      _startBackgroundSound();
+      _isPlayerstop = false;
+    }
     return Scaffold(
       backgroundColor: Colors.grey,
       body: Center(
@@ -19,25 +57,35 @@ class _HomeState extends State<Home> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TweenAnimationBuilder(
-                duration: Duration(milliseconds: 2000),
-                tween: ColorTween(begin: Colors.red, end: Colors.black),
-                builder: (BuildContext context, Color value, Widget child) {
-                  return  Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.translate, color: value),
-                        Text(
-                          'Wortschatz',
-                          style: TextStyle(
-                            fontSize: 38,
-                            color: value,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 2.0,
-                          ),
-                        ),
-                      ]
+                duration: Duration(milliseconds: 1500),
+                tween: _tweenRotation,
+                curve: Curves.elasticInOut,
+                builder: (BuildContext context, double angle, Widget child) {
+                  return Transform.rotate(
+                    angle: angle,
+                    child: Image.asset(
+                      "images/ic_logo_normal_foreground.png",
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.fill,
+                    ),
                   );
                 },
+              ),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.translate, color: Colors.black54),
+                    Text(
+                      'Wortschatz',
+                      style: TextStyle(
+                        fontSize: 38,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2.0,
+                      ),
+                    ),
+                  ]
               ),
               SizedBox(height: 20),
               Column(
@@ -54,7 +102,7 @@ class _HomeState extends State<Home> {
                     color: Colors.yellow[800],
                   ),
                   FlatButton.icon(
-                    onPressed: (){
+                    onPressed: () async{
                       Navigator.pushNamed(context, "/level");
                     },
                     icon: Icon(Icons.arrow_upward, color: Colors.grey[100],),

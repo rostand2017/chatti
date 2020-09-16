@@ -67,7 +67,7 @@ class _PartState extends State<Part> {
             child: ListTile(
               onTap: () => play(index),
               title: Text("Teil ${index+1}"),
-              subtitle: Text('Punkte: ${_scores.putIfAbsent("$_level.${index+1}", () => 0)} von 20'),
+              subtitle: _subTitleWidget(_scores, _level, index),
               enabled: isEnable(index),
             ),
           );
@@ -78,6 +78,25 @@ class _PartState extends State<Part> {
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
+    );
+  }
+
+  Widget _subTitleWidget(HashMap<String, int> scores, String level, index){
+    return Row(
+      children: [
+        Expanded(child: Text('Punkte von 20')),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            CircularProgressIndicator(
+              backgroundColor: Colors.orange[100],
+              valueColor: new AlwaysStoppedAnimation<Color>(Colors.orange),
+              value: (scores.putIfAbsent("$level.${index+1}", () => 0)) / 20,
+            ),
+            Text('${scores.putIfAbsent("$level.${index+1}", () => 0)}'),
+          ],
+        )
+      ],
     );
   }
 }

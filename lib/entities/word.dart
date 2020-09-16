@@ -6,6 +6,10 @@ class Word{
   static const String PRONOUN = "Pronomen";
   static const String VERB = "Verb";
   static const String ADJECTIVE = "Adjektiv";
+  static const String UNKNOWN = "unknown";
+  static const String CONNECTOR = "Konnektor";
+  static const String PREPOSITION = "Präprosition";
+  static const String ARTICLE = "Artikel";
 
   String word;
   String pluralForm;

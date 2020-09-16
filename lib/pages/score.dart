@@ -58,6 +58,12 @@ class _ScoreState extends State<Score> {
     return Scaffold(
       body: Center(
         child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("images/bg_chatti1ldpi.png"),
+                fit: BoxFit.cover
+              )
+            ),
             padding: EdgeInsets.all(10),
             child: ListView(
               children: [
@@ -70,6 +76,7 @@ class _ScoreState extends State<Score> {
                           width: 100,
                           height: 100,
                           fit: BoxFit.fill,
+                          semanticsLabel: "Hallo",
                         ),
                         radius: 100,
                       ),

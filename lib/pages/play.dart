@@ -6,6 +6,7 @@ import 'package:circle_button/circle_button.dart';
 import 'package:flutter/material.dart';
 import'package:chatti/entities/word_list_a1.dart';
 import'package:chatti/entities/word_list_a2.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Play extends StatefulWidget {
@@ -36,6 +37,7 @@ class _PlayState extends State<Play>{
   bool clicked = false;
   int score = 0;
   MaterialColor color;
+  AudioPlayer _player = AudioPlayer();
 
   /**
    * Run a step
@@ -231,7 +233,7 @@ class _PlayState extends State<Play>{
       return Colors.orange;
   }
 
-  void verifyAnswer(Word word){
+  void verifyAnswer(Word word) async{
     if(!clicked){
       setState(() {
         clicked = true;
@@ -240,10 +242,14 @@ class _PlayState extends State<Play>{
         setState(() {
           score ++;
         });
+        await _player.setAsset('sounds/hero_decorative-celebration-02.wav');
         runNextStep(0);
       }else{
+        await _player.setAsset('sounds/Wrong-answer-sound-effect.mp3');
         runNextStep(2);
       }
+      await _player.setVolume(0.5);
+      _player.play();
     }
   }
 
@@ -271,15 +277,15 @@ class _PlayState extends State<Play>{
       backgroundColor: Colors.white,
       body: SafeArea(
           child: Container(
-            /*decoration: BoxDecoration(
+            decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("images/pattern2.jpg"),
-                fit: BoxFit.contain,
-                repeat: ImageRepeat.repeat,
+                image: AssetImage("images/bg_chatti1ldpi.png"),
+                fit: BoxFit.cover,
+                repeat: ImageRepeat.noRepeat,
               ),
-              color: Colors.black,
+              color: Colors.black12,
               backgroundBlendMode: BlendMode.xor,
-            ),*/
+            ),
             child: Column(
               children: [
                 LinearProgressIndicator(
@@ -306,13 +312,14 @@ class _PlayState extends State<Play>{
                         fontSize: 40,
                         letterSpacing: 2.0,
                         color: getWordColor(),
+                        decoration: TextDecoration.overline,
                       ),
                     ),
                     Text(
                       "${words[position].pluralForm}",
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.yellow[800],
+                        fontSize: 14,
+                        color: Colors.orange[800],
                       ),
                     ),
                     SizedBox(height: 20,),
@@ -341,9 +348,10 @@ class _PlayState extends State<Play>{
                     ),
                     SizedBox(height: 20,),
                     Text(
-                      "score: $score",
+                      "  score: $score  ",
                       style: TextStyle(
-                        color: Colors.red[300],
+                        color: Colors.white,
+                        backgroundColor: Colors.red,
                         fontWeight: FontWeight.bold,
                         fontSize: 18.0,
                       ),
