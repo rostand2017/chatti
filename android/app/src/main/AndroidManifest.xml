@@ -6,6 +6,7 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
+
         android:name="io.flutter.app.FlutterApplication"
         android:label="chatti"
         android:icon="@mipmap/ic_logo_normal_foreground">
@@ -43,5 +44,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6745620935873225~8698410260" />
     </application>
 </manifest>

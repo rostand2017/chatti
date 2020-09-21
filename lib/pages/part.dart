@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:chatti/entities/nb_words.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'file:///C:/Users/Ross/AndroidStudioProjects/chatti/lib/pages/play.dart';
 import 'package:flutter/material.dart';
 import'package:chatti/entities/word_list_a1.dart';
@@ -8,6 +9,13 @@ import'package:chatti/entities/word_list_a2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Part extends StatefulWidget {
+  static MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    keywords: <String>['flutterio', 'beautiful apps'],
+    contentUrl: 'https://flutter.io',
+    childDirected: false,
+    testDevices: <String>[], //// Android emulators are considered test devices
+  );
+
   @override
   _PartState createState() => _PartState();
 }
@@ -17,6 +25,11 @@ class _PartState extends State<Part> {
   String _level;
   int _currentPart;
   HashMap<String, int> _scores = HashMap();
+
+
+  BannerAd _myBanner;
+  String _appId = "ca-app-pub-6745620935873225~8698410260";
+  String _pubId = "ca-app-pub-6745620935873225/9233596887";
 
   void play(index) {
     Navigator.pushNamed(context, "/play", arguments: {
@@ -35,7 +48,9 @@ class _PartState extends State<Part> {
   @override
   void initState(){
     super.initState();
+    FirebaseAdMob.instance.initialize(appId: _appId);
     setScores();
+    _buildBanner();
   }
 
   void setScores() async{
@@ -50,9 +65,25 @@ class _PartState extends State<Part> {
     });
   }
 
+  _buildBanner(){
+    _myBanner = BannerAd(
+      // Replace the testAdUnitId with an ad unit id from the AdMob dash.
+      // https://developers.google.com/admob/android/test-ads
+      // https://developers.google.com/admob/ios/test-ads
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.smartBanner,
+      targetingInfo: Part.targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event is $event");
+      },
+    );
+    _myBanner..load()..show(
+        anchorType: AnchorType.bottom
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    print("build");
     Map arguments = ModalRoute.of(context).settings.arguments;
     _level = arguments['level'];
     _currentPart = arguments['currentPart'];

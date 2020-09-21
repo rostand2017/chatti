@@ -10,13 +10,15 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   Tween<double> _tweenRotation;
   var _player = AudioPlayer();
-  bool _isPlayerstop = false;
+  AppLifecycleState _lastLifecycleState;
+
+
   _startBackgroundSound() async{
     try{
-      await _player.setUrl("http://www.orangefreesounds.com/wp-content/uploads/2020/07/Funny-music-loop-for-games-and-videos.mp3");
+      await _player.setAsset("sounds/Funny-music-loop-for-games-and-videos.mp3");
       await _player.setVolume(0.4);
       _player.setLoopMode(LoopMode.all);
       _player.play();
@@ -27,27 +29,46 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state){
+      case AppLifecycleState.inactive:
+        _player.pause();
+        break;
+      case AppLifecycleState.resumed:
+        _player.play();
+        break;
+      case AppLifecycleState.paused:
+        // TODO: Handle this case.
+        break;
+      case AppLifecycleState.detached:
+        _player.pause();
+        break;
+    }
+    print("state : $_lastLifecycleState");
+    setState(() {
+      _lastLifecycleState = state;
+    });
+  }
+
+  @override
   void dispose() {
-    print("dispose.....dispose.....dispose.....dispose.....dispose.....dispose.....dispose.....");
+    WidgetsBinding.instance.removeObserver(this);
     _player.dispose();
-    _isPlayerstop = true;
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _startBackgroundSound();
     _tweenRotation = Tween<double>(begin: pi, end: 0);
   }
 
+
   @override
   Widget build(BuildContext context) {
-    if(_isPlayerstop){
-      print("Replay...Replay...Replay...Replay...Replay...");
-      _startBackgroundSound();
-      _isPlayerstop = false;
-    }
+    print("lifec $_lastLifecycleState");
     return Scaffold(
       backgroundColor: Colors.grey,
       body: Center(

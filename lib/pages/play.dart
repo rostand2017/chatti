@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:math';
 import 'package:chatti/entities/nb_words.dart';
 import 'package:chatti/entities/word.dart';
+import 'package:chatti/pages/part.dart';
 import 'package:circle_button/circle_button.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import'package:chatti/entities/word_list_a1.dart';
 import'package:chatti/entities/word_list_a2.dart';
@@ -144,11 +146,10 @@ class _PlayState extends State<Play>{
     }else{
       switch(level){
         case "A1":
-          words = wordsA1.getRange(part*NB_STEP - NB_STEP, part*NB_STEP);
+          words = wordsA1.getRange(part*NB_STEP - NB_STEP, part*NB_STEP).toList();
           words.shuffle();
           break;
         case "A2":
-          print("jello ${part}");
           words = wordsA2.getRange(part*NB_STEP - NB_STEP, part*NB_STEP).toList();
           words.shuffle();
           break;
@@ -253,6 +254,13 @@ class _PlayState extends State<Play>{
     }
   }
 
+  // load a video after 5 parts
+  void _loadAdsVideo(int part){
+    double cu = part/5;
+    if(cu*5 != part.toDouble())
+      RewardedVideoAd.instance.load(adUnitId: RewardedVideoAd.testAdUnitId, targetingInfo: Part.targetingInfo);
+  }
+
   MaterialColor getGoodColor(Word word){
     if(!clicked)
       return Colors.orange;
@@ -272,6 +280,7 @@ class _PlayState extends State<Play>{
     if(words == null){
       setWords();
       playOnce();
+      _loadAdsVideo(part);
     }
     return Scaffold(
       backgroundColor: Colors.white,
@@ -327,14 +336,6 @@ class _PlayState extends State<Play>{
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: solutions.map((Word word) {
                         CircleButton btn = CircleButton(
-                          child: Padding(child:
-                            Text(
-                              word.translation[Word.FRENCH],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            padding: EdgeInsets.all(4),
-                          ),
                           onTap: (){
                             verifyAnswer(word);
                           },
@@ -342,6 +343,12 @@ class _PlayState extends State<Play>{
                           height: 200,
                           borderStyle: BorderStyle.none,
                           backgroundColor: getGoodColor(word),
+                          child:
+                          Text(
+                            word.translation[Word.FRENCH],
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         );
                         return Expanded(child: btn,);
                     }).toList(),

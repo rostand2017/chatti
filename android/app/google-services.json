@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "126695646457",
+    "firebase_url": "https://chatti-wortschatz.firebaseio.com",
+    "project_id": "chatti-wortschatz",
+    "storage_bucket": "chatti-wortschatz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126695646457:android:1cae4e569cac0ea343ae28",
+        "android_client_info": {
+          "package_name": "com.fandf.chatti"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "126695646457-ertj9iaraps6quoipfjrv6d2sqvpsq6a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1yDlDtOPP58fSAa0HOVLu5DStFN20qu4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126695646457-ertj9iaraps6quoipfjrv6d2sqvpsq6a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
