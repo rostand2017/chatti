@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:chatti/pages/play.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 
 class Home extends StatefulWidget {
@@ -11,12 +12,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
+  final   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   Tween<double> _tweenRotation;
   var _player = AudioPlayer();
   AppLifecycleState _lastLifecycleState;
 
-
-  _startBackgroundSound() async{
+  void _startBackgroundSound() async{
     try{
       await _player.setAsset("sounds/Funny-music-loop-for-games-and-videos.mp3");
       await _player.setVolume(0.4);
@@ -26,6 +27,18 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       print("bad url exception !");
       print(e);
     }
+  }
+
+  void _showNotification() async{
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0, 'plain title', 'plain body', platformChannelSpecifics,
+        payload: 'item x');
   }
 
   @override
@@ -60,8 +73,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _showNotification();
     WidgetsBinding.instance.addObserver(this);
-    _startBackgroundSound();
+    //_startBackgroundSound();
     _tweenRotation = Tween<double>(begin: pi, end: 0);
   }
 
