@@ -257,8 +257,21 @@ class _PlayState extends State<Play>{
   // load a video after 5 parts
   void _loadAdsVideo(int part){
     double cu = part/5;
-    if(cu*5 != part.toDouble())
-      RewardedVideoAd.instance.load(adUnitId: RewardedVideoAd.testAdUnitId, targetingInfo: Part.targetingInfo);
+    if(cu == (part/5).toInt().toDouble()) {
+      RewardedVideoAd.instance..load(adUnitId: RewardedVideoAd.testAdUnitId, targetingInfo: Part.targetingInfo)..show();
+      RewardedVideoAd.instance.listener =
+        (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
+            print("reward : $rewardAmount");
+            if(event == RewardedVideoAdEvent.started){
+              print("reward started");
+              timer.cancel();
+            }
+            if(event == RewardedVideoAdEvent.closed){
+              print("reward closed");
+              startTimer();
+            }
+      };
+    }
   }
 
   MaterialColor getGoodColor(Word word){
