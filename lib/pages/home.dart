@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:chatti/pages/play.dart';
+import 'package:chatti/tools/today.word.notification.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 
 class Home extends StatefulWidget {
@@ -12,7 +12,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
-  final   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   Tween<double> _tweenRotation;
   var _player = AudioPlayer();
   AppLifecycleState _lastLifecycleState;
@@ -29,17 +28,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
   }
 
-  void _showNotification() async{
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-        0, 'plain title', 'plain body', platformChannelSpecifics,
-        payload: 'item x');
-  }
+
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -73,7 +62,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    _showNotification();
+    TodayWordNotification.showNotification();
     WidgetsBinding.instance.addObserver(this);
     //_startBackgroundSound();
     _tweenRotation = Tween<double>(begin: pi, end: 0);

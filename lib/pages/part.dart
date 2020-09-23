@@ -4,8 +4,6 @@ import 'package:chatti/entities/nb_words.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'file:///C:/Users/Ross/AndroidStudioProjects/chatti/lib/pages/play.dart';
 import 'package:flutter/material.dart';
-import'package:chatti/entities/word_list_a1.dart';
-import'package:chatti/entities/word_list_a2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Part extends StatefulWidget {

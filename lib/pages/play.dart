@@ -293,7 +293,8 @@ class _PlayState extends State<Play>{
     if(words == null){
       setWords();
       playOnce();
-      _loadAdsVideo(part);
+      if (part != null)
+        _loadAdsVideo(part);
     }
     return Scaffold(
       backgroundColor: Colors.white,
